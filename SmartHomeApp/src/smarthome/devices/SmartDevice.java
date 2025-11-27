@@ -4,22 +4,46 @@
  */
 package smarthome.devices;
 
-public abstract class SmartDevice {
-    private String deviceId;
-    private String name;
+import smarthome.interfaces.Controllable;
+import smarthome.interfaces.EnergyConsumer;
+
+public abstract class SmartDevice implements Controllable, EnergyConsumer {
+    protected String id;
     protected boolean isOn;
 
-    public SmartDevice(String deviceId, String name) {
-        this.deviceId = deviceId;
-        this.name = name;
+    public SmartDevice(String id) {
+        this.id = id;
         this.isOn = false;
     }
 
-    public String getDeviceId() { return deviceId; }
-    public String getName() { return name; }
-    public boolean isDeviceOn() { return isOn; }
+    @Override
+    public void turnOn() {
+        isOn = true;
+        System.out.println(id + " is now ON");
+    }
 
-    // Mandatory abstract methods
-    public abstract void performSelfCheck();
+    @Override
+    public void turnOff() {
+        isOn = false;
+        System.out.println(id + " is now OFF");
+    }
+
+    @Override
+    public String getStatus() {
+        return isOn ? "Device is ON" : "Device is OFF";
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    // Mandatory abstract methods for subclasses
+    public abstract String getDeviceType();
+    public abstract String getInfo();
+
+    @Override
+    public abstract void activateLowPowerMode();
+
+    @Override
     public abstract double getCurrentPowerConsumption();
 }
