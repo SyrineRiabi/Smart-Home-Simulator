@@ -3,77 +3,38 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package smarthome.controller;
-
-/**
- *
- * @author MSI
- */
-package smarthome.controller;
-
-import smarthome.home.Home;
+import smarthome.home.Home;  // Added: Import Nour's Home class for global access
 import smarthome.devices.*;
-import smarthome.sensors.*;
-import smarthome.exceptions.DeviceNotFoundException;
-import java.util.*;
+import smarthome.devices.SmartDevice.*;
+import java.util.List;
 
-public class CentralController {
-    private Home home;
-    private List<AutomationRule> rules = new ArrayList<>();
+public class AutomationRule {
+    private String condition;  // e.g., "motionDetected"
+    private Runnable action;   // Lambda for the action (e.g., turn on light)
 
-    public CentralController(Home home) {
-        this.home = home;
+    // Updated: Constructor can optionally take Home for global access (or pass devices later)
+    public AutomationRule(String condition, Runnable action) {
+        this.condition = condition;
+        this.action = action;
     }
 
-    // Execute commands (e.g., "turn on all lights")
-    public void executeAction(String action) {
-        List<SmartDevice> allDevices = home.getAllDevices();  // Assume method in Home
+    // Updated: Check condition using global device list from Home (polymorphism for sensor types)
+    public boolean checkCondition(Home home) {
+        List<SmartDevice> allDevices = home.getAllDevices();  // Nour's global list
         for (SmartDevice device : allDevices) {
-            if (action.equals("turn on all lights") && device instanceof Light) {
-                ((Controllable) device).turnOn();  // Polymorphism via interface
-            } else if (action.equals("turn off all devices")) {
-                ((Controllable) device).turnOff();
+            if (device instanceof MotionSensor && condition.equals("motionDetected")) {
+                return ((MotionSensor) device).isMotionDetected();  // Assume method exists in MotionSensor
+            } else if (device instanceof SmokeSensor && condition.equals("smokeDetected")) {
+                return ((SmokeSensor) device).isSmokeDetected();  // Assume method exists in SmokeSensor
             }
             // Add more actions (e.g., adjust thermostat)
         }
+        return false;  // No matching sensor or condition
     }
 
-    // List all device statuses
-    public List<String> listAllStatuses() {
-        List<String> statuses = new ArrayList<>();
-        for (SmartDevice device : home.getAllDevices()) {
-            statuses.add(device.getStatus());  // Polymorphic call
-        }
-        return statuses;
+    // Execute action (unchanged, but now works with global devices)
+    public void executeAction() {
+        action.run();  // Runs the defined action (e.g., turn on a light)
     }
-
-    // Search device by ID or type
-    public SmartDevice findDevice(String id) throws DeviceNotFoundException {
-        SmartDevice device = home.findDeviceById(id);  // Assume method in Home
-        if (device == null) throw new DeviceNotFoundException("Device not found: " + id);
-        return device;
-    }
-
-    // Add automation rule
-    public void addRule(AutomationRule rule) {
-        rules.add(rule);
-    }
-
-    // Run automation (check sensors and trigger rules)
-    public void runAutomation() {
-        List<SmartDevice> sensors = home.getAllDevices().stream()
-            .filter(d -> d instanceof MotionSensor || d instanceof SmokeSensor)
-            .toList();  // Get sensors
-        for (AutomationRule rule : rules) {
-            for (SmartDevice sensor : sensors) {
-                if (rule.checkCondition(sensor)) {
-                    rule.executeAction();
-                }
-            }
-        }
-    }
-
-    // Add device to room (integrate with Home)
-    public void addDeviceToRoom(String roomName, SmartDevice device) {
-        home.addDeviceToRoom(roomName, device);  // Assume method in Home
-    }
+    // Example usage: new AutomationRule("motionDetected", () -> { Light light = (Light) home.findDeviceById("L1"); light.turnOn(); });
 }
