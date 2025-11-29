@@ -3,38 +3,79 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package smarthome.controller;
-import smarthome.home.Home;  // Added: Import Nour's Home class for global access
+
+import sensors.*;
 import smarthome.devices.*;
-import smarthome.devices.SmartDevice.*;
-import java.util.List;
+import smarthome.home.Home;
 
 public class AutomationRule {
-    private String condition;  // e.g., "motionDetected"
-    private Runnable action;   // Lambda for the action (e.g., turn on light)
 
-    // Updated: Constructor can optionally take Home for global access (or pass devices later)
-    public AutomationRule(String condition, Runnable action) {
-        this.condition = condition;
+    private String name;
+    private Sensor sensor;
+    private SmartDevice targetDevice;
+    private String conditionType;     // motion, doorOpen, temperatureAbove…
+    private double threshold;         // used only for temperature rules
+    private String action;            // turnOn, turnOff, toggle
+
+    public AutomationRule(String name, Sensor sensor, SmartDevice targetDevice,
+                          String conditionType, double threshold, String action) {
+        this.name = name;
+        this.sensor = sensor;
+        this.targetDevice = targetDevice;
+        this.conditionType = conditionType;
+        this.threshold = threshold;
         this.action = action;
     }
 
-    // Updated: Check condition using global device list from Home (polymorphism for sensor types)
+    /**
+     * Evaluates whether the rule should execute based on the sensor state.
+     */
     public boolean checkCondition(Home home) {
-        List<SmartDevice> allDevices = home.getAllDevices();  // Nour's global list
-        for (SmartDevice device : allDevices) {
-            if (device instanceof MotionSensor && condition.equals("motionDetected")) {
-                return ((MotionSensor) device).isMotionDetected();  // Assume method exists in MotionSensor
-            } else if (device instanceof SmokeSensor && condition.equals("smokeDetected")) {
-                return ((SmokeSensor) device).isSmokeDetected();  // Assume method exists in SmokeSensor
-            }
-            // Add more actions (e.g., adjust thermostat)
+
+        if (sensor instanceof MotionSensor && conditionType.equals("motion")) {
+            return true; // motion always triggers
         }
-        return false;  // No matching sensor or condition
+
+        if (sensor instanceof DoorSensor) {
+            DoorSensor d = (DoorSensor) sensor;
+
+            if (conditionType.equals("doorOpen") && d.isDoorOpen()) return true;
+            if (conditionType.equals("doorClosed") && !d.isDoorOpen()) return true;
+        }
+
+        if (sensor instanceof TemperatureSensor) {
+            TemperatureSensor t = (TemperatureSensor) sensor;
+            double temp = t.getTemperature();
+
+            if (conditionType.equals("temperatureAbove") && temp > threshold) return true;
+            if (conditionType.equals("temperatureBelow") && temp < threshold) return true;
+        }
+
+        return false;
     }
 
-    // Execute action (unchanged, but now works with global devices)
+    /**
+     * Executes the linked device action.
+     */
     public void executeAction() {
-        action.run();  // Runs the defined action (e.g., turn on a light)
+        switch (action) {
+            case "turnOn":
+                targetDevice.turnOn();
+                break;
+            case "turnOff":
+                targetDevice.turnOff();
+                break;
+            case "toggle":
+                targetDevice.toggle();
+                break;
+            default:
+                System.out.println("Unknown action in rule: " + name);
+        }
     }
-    // Example usage: new AutomationRule("motionDetected", () -> { Light light = (Light) home.findDeviceById("L1"); light.turnOn(); });
+
+    @Override
+    public String toString() {
+        return "Rule[" + name + "]";
+    }
 }
+
