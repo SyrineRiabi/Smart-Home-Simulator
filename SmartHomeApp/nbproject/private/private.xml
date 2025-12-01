@@ -8,6 +8,12 @@
             <file>file:/C:/Users/asus/Desktop/Smart-Home-Simulator/SmartHomeApp/src/sensors/TemperatureSensor.java</file>
             <file>file:/C:/Users/asus/Desktop/Smart-Home-Simulator/SmartHomeApp/src/sensors/DoorSensor.java</file>
             <file>file:/C:/Users/asus/Desktop/Smart-Home-Simulator/SmartHomeApp/src/mainapp/Main.java</file>
+            <file>file:/C:/Users/asus/Desktop/Smart-Home-Simulator/SmartHomeApp/src/smarthome/devices/SmartDevice.java</file>
+            <file>file:/C:/Users/asus/Desktop/Smart-Home-Simulator/SmartHomeApp/src/smarthome/exceptions/DeviceNotFoundException.java</file>
+            <file>file:/C:/Users/asus/Desktop/Smart-Home-Simulator/SmartHomeApp/src/smarthome/interfaces/Controllable.java</file>
+            <file>file:/C:/Users/asus/Desktop/Smart-Home-Simulator/SmartHomeApp/src/smarthome/interfaces/EnergyConsumer.java</file>
+            <file>file:/C:/Users/asus/Desktop/Smart-Home-Simulator/SmartHomeApp/src/smarthome/interfaces/Schedulable.java</file>
+            <file>file:/C:/Users/asus/Desktop/Smart-Home-Simulator/SmartHomeApp/src/smarthomeapp/SmartHomeApp.java</file>
         </group>
     </open-files>
 </project-private>
