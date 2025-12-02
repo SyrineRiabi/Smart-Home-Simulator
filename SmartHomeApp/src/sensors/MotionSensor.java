@@ -7,11 +7,16 @@ package sensors;
 public class MotionSensor extends Sensor {
 
     public MotionSensor(String id) {
-        super(id); // Calls the constructor of Sensor, which sets the ID
+        super(id); // Calls Sensor constructor
     }
 
     @Override
     public void detect() {
-        System.out.println("Motion detected by sensor " + getDeviceId());
+        if (getStatus()) {
+            System.out.println("Motion detected by sensor " + getDeviceId());
+        } else {
+            System.out.println("Motion sensor " + getDeviceId() + " is OFF");
+        }
     }
 }
+

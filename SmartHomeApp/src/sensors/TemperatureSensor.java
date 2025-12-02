@@ -23,6 +23,11 @@ public class TemperatureSensor extends Sensor {
 
     @Override
     public void detect() {
-        System.out.println("Temperature sensor " + getDeviceId() + " reads " + temperature + "°C");
+        if (getStatus()) {
+            System.out.println("Temperature sensor " + getDeviceId() + " reads " + temperature + "°C");
+        } else {
+            System.out.println("Temperature sensor " + getDeviceId() + " is OFF");
+        }
     }
 }
+

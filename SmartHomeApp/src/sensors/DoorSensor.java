@@ -24,10 +24,15 @@ public class DoorSensor extends Sensor {
 
     @Override
     public void detect() {
-        if (doorOpen) {
-            System.out.println("Door sensor " + getDeviceId() + ": Door is OPEN");
+        if (getStatus()) {
+            if (doorOpen) {
+                System.out.println("Door sensor " + getDeviceId() + ": Door is OPEN");
+            } else {
+                System.out.println("Door sensor " + getDeviceId() + ": Door is CLOSED");
+            }
         } else {
-            System.out.println("Door sensor " + getDeviceId() + ": Door is CLOSED");
+            System.out.println("Door sensor " + getDeviceId() + " is OFF");
         }
     }
 }
+

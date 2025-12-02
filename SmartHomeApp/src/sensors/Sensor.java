@@ -7,7 +7,7 @@ package sensors;
 public abstract class Sensor {
 
     private String id;
-    private boolean status; // This will track whether the sensor is on or off
+    private boolean status; // tracks whether the sensor is on or off
 
     public Sensor(String id) {
         this.id = id;
@@ -31,11 +31,11 @@ public abstract class Sensor {
         return status;
     }
 
-    // Return the ID of the sensor (inherited from SmartDevice)
+    // Return the ID of the sensor
     public String getDeviceId() {
         return id;
     }
 
-    // Abstract method that must be implemented by subclasses to define detection behavior
+    // Abstract method to define detection behavior
     public abstract void detect();
 }
