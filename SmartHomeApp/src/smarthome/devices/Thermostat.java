@@ -1,16 +1,12 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package smarthome.devices;
 
 public class Thermostat extends SmartDevice {
 
-    private int temperature;
+    private double temperature; // Changed from int to double for compatibility
 
     public Thermostat(String id) {
         super(id);
-        this.temperature = 22; // default temperature
+        this.temperature = 22.0; // default temperature (as a double)
     }
 
     @Override
@@ -22,24 +18,38 @@ public class Thermostat extends SmartDevice {
     public String getInfo() {
         return "Thermostat{id=" + id + ", temperature=" + temperature + ", status=" + getStatus() + "}";
     }
+    
+    // --- EnergyConsumer Fix (Required by CentralController) ---
 
-    // Controllable methods are inherited: turnOn(), turnOff(), getStatus()
-
-    // EnergyConsumer methods
     @Override
     public void activateLowPowerMode() {
         System.out.println("Thermostat " + id + " is now in low-power mode.");
-        // For demonstration, reduce temperature by 2 degrees
-        temperature -= 2;
+        temperature -= 2.0; 
     }
 
     @Override
     public double getCurrentPowerConsumption() {
         // Example: each degree above 20 consumes 0.5 units/hour
-        return Math.max(0, (temperature - 20) * 0.5);
+        return isOn ? Math.max(0, (temperature - 20) * 0.5) : 0.0;
+    }
+    
+    // CRITICAL FIX: Required by the CentralController's getTotalEnergyUsage()
+    public double getEnergyUsage() {
+        return getCurrentPowerConsumption(); 
+    }
+    
+    // --- Thermostat-specific methods ---
+    
+    // Updated parameter type to double
+    public void setTemperature(double temperature) { 
+        this.temperature = temperature;
     }
 
-    // Thermostat-specific methods
+    public double getTemperature() {
+        return temperature;
+    }
+
+    // Other methods remain the same (increase, decrease)
     public void increase() {
         temperature++;
         System.out.println(id + " temperature increased to " + temperature);
@@ -48,13 +58,5 @@ public class Thermostat extends SmartDevice {
     public void decrease() {
         temperature--;
         System.out.println(id + " temperature decreased to " + temperature);
-    }
-
-    public int getTemperature() {
-        return temperature;
-    }
-
-    public void setTemperature(int temperature) {
-        this.temperature = temperature;
     }
 }
