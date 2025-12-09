@@ -7,11 +7,11 @@ import smarthome.devices.SmartDevice;
 
 public class Bedroom extends HomeStructure {
 
-    private List<SmartDevice> devices;
+    private final List<SmartDevice> devices;
 
     public Bedroom() {
         super("Bedroom");
-        devices = new ArrayList<>();
+        this.devices = new ArrayList<>();
     }
 
     @Override

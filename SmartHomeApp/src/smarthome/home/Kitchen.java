@@ -7,11 +7,11 @@ import smarthome.devices.SmartDevice;
 
 public class Kitchen extends HomeStructure {
 
-    private List<SmartDevice> devices;
+    private final List<SmartDevice> devices;
 
     public Kitchen() {
         super("Kitchen");
-        devices = new ArrayList<>();
+        this.devices = new ArrayList<>();
     }
 
     @Override

@@ -2,11 +2,11 @@ package smarthome.devices;
 
 public class Thermostat extends SmartDevice {
 
-    private double temperature; // Changed from int to double for compatibility
+    private int temperature;
 
     public Thermostat(String id) {
         super(id);
-        this.temperature = 22.0; // default temperature (as a double)
+        this.temperature = 22; // default temperature
     }
 
     @Override
@@ -18,38 +18,24 @@ public class Thermostat extends SmartDevice {
     public String getInfo() {
         return "Thermostat{id=" + id + ", temperature=" + temperature + ", status=" + getStatus() + "}";
     }
-    
-    // --- EnergyConsumer Fix (Required by CentralController) ---
 
+    // EnergyConsumer methods
     @Override
     public void activateLowPowerMode() {
         System.out.println("Thermostat " + id + " is now in low-power mode.");
-        temperature -= 2.0; 
+        // For demonstration, reduce temperature by 2 degrees
+        temperature -= 2;
     }
 
     @Override
     public double getCurrentPowerConsumption() {
         // Example: each degree above 20 consumes 0.5 units/hour
-        return isOn ? Math.max(0, (temperature - 20) * 0.5) : 0.0;
+        return Math.max(0, (temperature - 20) * 0.5);
     }
     
-    // CRITICAL FIX: Required by the CentralController's getTotalEnergyUsage()
-    public double getEnergyUsage() {
-        return getCurrentPowerConsumption(); 
-    }
-    
-    // --- Thermostat-specific methods ---
-    
-    // Updated parameter type to double
-    public void setTemperature(double temperature) { 
-        this.temperature = temperature;
-    }
+    // NOTE: getEnergyUsage() is now inherited from SmartDevice!
 
-    public double getTemperature() {
-        return temperature;
-    }
-
-    // Other methods remain the same (increase, decrease)
+    // Thermostat-specific methods
     public void increase() {
         temperature++;
         System.out.println(id + " temperature increased to " + temperature);
@@ -58,5 +44,13 @@ public class Thermostat extends SmartDevice {
     public void decrease() {
         temperature--;
         System.out.println(id + " temperature decreased to " + temperature);
+    }
+
+    public int getTemperature() {
+        return temperature;
+    }
+
+    public void setTemperature(int temperature) {
+        this.temperature = temperature;
     }
 }

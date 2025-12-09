@@ -1,92 +1,52 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package smarthome.controller;
 
-import smarthome.home.*;                     // rooms + Home
-import smarthome.devices.*;                  // SmartDevice, Light, Thermostat...
-import sensors.*;                            // FIXED → sensors package
+import smarthome.home.*;               
+import smarthome.devices.*;             
+import sensors.*;                       
 import smarthome.exceptions.DeviceNotFoundException;
-import smarthome.interfaces.*;               // Controllable + EnergyConsumer
+import smarthome.interfaces.*;          
 import java.util.*;
+import java.time.LocalTime;
 
-/**
- * CentralController manages the smart home, including devices, automation, and commands.
- * Integrates with Home for global device access and room management.
- * @author Yosr
- */
 public class CentralController {
 
-    private Home home;                         // Reference to Nour’s global Home structure
-    private List<AutomationRule> rules = new ArrayList<>();
+    private final Home home;
+    private final List<AutomationRule> rules = new ArrayList<>();
 
-    /**
-     * Constructor: Initializes the controller with the home structure.
-     */
     public CentralController(Home home) {
         this.home = home;
     }
 
-    /**
-     * Executes a predefined action (e.g., "turn on all lights").
-     */
     public void executeAction(String action) {
         List<SmartDevice> allDevices = home.getAllDevices();
 
         switch (action.toLowerCase()) {
-            case "turn on all lights":
-                for (SmartDevice device : allDevices) {
-                    if (device instanceof Light) {
-                        ((Controllable) device).turnOn();
-                    }
-                }
-                break;
+            case "turn on all lights" -> allDevices.stream()
+                    .filter(d -> d instanceof Light)
+                    .forEach(d -> ((Controllable)d).turnOn());
 
-            case "turn off all devices":
-                for (SmartDevice device : allDevices) {
-                    if (device instanceof Controllable) {
-                        ((Controllable) device).turnOff();
-                    }
-                }
-                break;
+            case "turn off all devices" -> allDevices.stream()
+                    .filter(d -> d instanceof Controllable)
+                    .forEach(d -> ((Controllable)d).turnOff());
 
-            case "adjust thermostat":
-                for (SmartDevice device : allDevices) {
-                    if (device instanceof Thermostat) {
-                        ((Thermostat) device).setTemperature(22.0);
-                    }
-                }
-                break;
+            case "adjust thermostat" -> allDevices.stream()
+                    .filter(d -> d instanceof Thermostat)
+                    .forEach(d -> ((Thermostat)d).setTemperature(22));
 
-            default:
-                System.out.println("Unknown action: " + action);
+            default -> System.out.println("Unknown action: " + action);
         }
     }
 
-    /**
-     * Lists the status of all devices.
-     */
     public List<String> listAllStatuses() {
         List<String> statuses = new ArrayList<>();
-
-        for (SmartDevice device : home.getAllDevices()) {
-            statuses.add(device.getStatus());
-        }
-
+        home.getAllDevices().forEach(d -> statuses.add(d.getStatus()));
         return statuses;
     }
 
-    /**
-     * Finds a device by ID using Nour’s Home global list.
-     */
     public SmartDevice findDevice(String id) throws DeviceNotFoundException {
         return home.findDeviceById(id);
     }
 
-    /**
-     * Adds an automation rule.
-     */
     public void addRule(AutomationRule rule) {
         rules.add(rule);
     }
@@ -101,12 +61,19 @@ public class CentralController {
             }
         }
     }
-
+    
     /**
-     * Adds a new device to a specific room.
+     * Runs scheduled tasks on all Schedulable devices for the current time.
      */
-    public void addDeviceToRoom(String roomName, SmartDevice device) {
+    public void runScheduledTasks(LocalTime currentTime) {
+        home.getAllDevices().stream()
+            .filter(d -> d instanceof Schedulable)
+            .map(d -> (Schedulable) d)
+            .forEach(s -> s.executeScheduledTask(currentTime));
+    }
 
+
+    public void addDeviceToRoom(String roomName, SmartDevice device) {
         HomeStructure room = switch (roomName.toLowerCase()) {
             case "living room" -> home.getLivingRoom();
             case "kitchen"     -> home.getKitchen();
@@ -122,44 +89,44 @@ public class CentralController {
         }
     }
 
-    /**
-     * Calculates all energy usage by devices implementing EnergyConsumer.
-     */
     public double getTotalEnergyUsage() {
-        double total = 0.0;
-
-        for (SmartDevice device : home.getAllDevices()) {
-            if (device instanceof EnergyConsumer) {
-                total += ((EnergyConsumer) device).getEnergyUsage();
-            }
-        }
-
-        return total;
+        // Correctly maps to the fixed getEnergyUsage() in SmartDevice
+        return home.getAllDevices().stream()
+                .filter(d -> d instanceof EnergyConsumer)
+                .mapToDouble(d -> ((EnergyConsumer)d).getEnergyUsage()) 
+                .sum();
     }
 
-    /**
-     * Parses and executes commands like: "turn on L1"
-     */
     public void parseAndExecuteCommand(String command) {
         String[] parts = command.split(" ");
-
-        if (parts.length < 3) {
-            System.out.println("Invalid command format.");
+        if (parts.length != 2) {
+            System.out.println("Invalid command format. Use: <action> <deviceId>");
             return;
         }
 
-        String action = parts[0] + " " + parts[1];   // "turn on"
-        String target = parts[2];                    // device ID
+        String action = parts[0].toLowerCase();  
+        String deviceId = parts[1];
 
         try {
-            SmartDevice device = findDevice(target);
+            SmartDevice device = findDevice(deviceId);
 
-            if (action.equals("turn on") && device instanceof Controllable) {
-                ((Controllable) device).turnOn();
-            } else if (action.equals("turn off") && device instanceof Controllable) {
-                ((Controllable) device).turnOff();
-            } else {
-                System.out.println("Invalid command for device: " + target);
+            switch (action) {
+                case "turnon" -> {
+                    if (device instanceof Controllable controllableDevice) controllableDevice.turnOn();
+                }
+                case "turnoff" -> {
+                    if (device instanceof Controllable controllableDevice) controllableDevice.turnOff();
+                }
+                case "toggle" -> {
+                    if (device instanceof Controllable controllableDevice) {
+                        if (controllableDevice.getStatus().contains("ON")) { 
+                            controllableDevice.turnOff();
+                        } else {
+                            controllableDevice.turnOn();
+                        }
+                    }
+                }
+                default -> System.out.println("Unknown action: " + action);
             }
 
         } catch (DeviceNotFoundException e) {

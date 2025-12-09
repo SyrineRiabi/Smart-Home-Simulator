@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package sensors;
 
 public class TemperatureSensor extends Sensor {
@@ -23,6 +19,10 @@ public class TemperatureSensor extends Sensor {
 
     @Override
     public void detect() {
-        System.out.println("Temperature sensor " + getDeviceId() + " reads " + temperature + "°C");
+        if (getStatus()) {
+            System.out.println("Temperature sensor " + getDeviceId() + " reads " + temperature + "°C");
+        } else {
+            System.out.println("Temperature sensor " + getDeviceId() + " is OFF");
+        }
     }
 }

@@ -1,13 +1,10 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package smarthome.devices;
 
 import smarthome.interfaces.Controllable;
 import smarthome.interfaces.EnergyConsumer;
 
 public abstract class SmartDevice implements Controllable, EnergyConsumer {
+    
     protected String id;
     protected boolean isOn;
 
@@ -30,20 +27,30 @@ public abstract class SmartDevice implements Controllable, EnergyConsumer {
 
     @Override
     public String getStatus() {
-        return isOn ? "Device is ON" : "Device is OFF";
+        return id + " Status: " + (isOn ? "ON" : "OFF");
     }
 
     public String getId() {
         return id;
     }
 
-    // Mandatory abstract methods for subclasses
-    public abstract String getDeviceType();
-    public abstract String getInfo();
-
+    // --- EnergyConsumer Implementation (CRITICAL FIX) ---
+    
+    /**
+     * Energy usage is 0 if OFF, otherwise, it uses the device's potential consumption.
+     */
+    @Override
+    public double getEnergyUsage() {
+        return isOn ? getCurrentPowerConsumption() : 0.0;
+    }
+    
+    // Mandatory abstract methods
     @Override
     public abstract void activateLowPowerMode();
 
     @Override
     public abstract double getCurrentPowerConsumption();
+    
+    public abstract String getDeviceType();
+    public abstract String getInfo();
 }

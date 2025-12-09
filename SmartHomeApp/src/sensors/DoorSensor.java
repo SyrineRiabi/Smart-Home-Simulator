@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package sensors;
 
 public class DoorSensor extends Sensor {
@@ -24,10 +20,14 @@ public class DoorSensor extends Sensor {
 
     @Override
     public void detect() {
-        if (doorOpen) {
-            System.out.println("Door sensor " + getDeviceId() + ": Door is OPEN");
+        if (getStatus()) {
+            if (doorOpen) {
+                System.out.println("Door sensor " + getDeviceId() + ": Door is OPEN");
+            } else {
+                System.out.println("Door sensor " + getDeviceId() + ": Door is CLOSED");
+            }
         } else {
-            System.out.println("Door sensor " + getDeviceId() + ": Door is CLOSED");
+            System.out.println("Door sensor " + getDeviceId() + " is OFF");
         }
     }
 }

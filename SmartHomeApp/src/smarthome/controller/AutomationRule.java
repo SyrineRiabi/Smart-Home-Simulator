@@ -1,21 +1,21 @@
 package smarthome.controller;
 
 import sensors.*;
-import smarthome.devices.*;
+import smarthome.devices.SmartDevice;
+import smarthome.interfaces.Controllable;
 import smarthome.home.Home;
-import smarthome.interfaces.Controllable; // <-- Added this import!
 
 public class AutomationRule {
 
-    private String name;
-    private Sensor sensor;
-    private SmartDevice targetDevice;
-    private String conditionType; // motion, doorOpen, temperatureAbove…
-    private double threshold;     // used only for temperature rules
-    private String action;        // turnOn, turnOff, toggle (will be fixed)
+    private final String name;
+    private final Sensor sensor;
+    private final SmartDevice targetDevice;
+    private final String conditionType;
+    private final double threshold;
+    private final String action;
 
-    public AutomationRule(String name, Sensor sensor, SmartDevice targetDevice,
-                          String conditionType, double threshold, String action) {
+    public AutomationRule(final String name, final Sensor sensor, final SmartDevice targetDevice,
+                          final String conditionType, final double threshold, final String action) {
         this.name = name;
         this.sensor = sensor;
         this.targetDevice = targetDevice;
@@ -24,70 +24,65 @@ public class AutomationRule {
         this.action = action;
     }
 
-    /**
-     * Evaluates whether the rule should execute based on the sensor state.
-     */
-    // ... (checkCondition method is fine and remains the same)
+    public boolean checkCondition(Home home) {
 
-    /**
-     * Executes the linked device action.
-     * CRITICAL FIX: We must check if the targetDevice is Controllable before executing actions.
-     */
+        if (sensor instanceof MotionSensor motionSensor && conditionType.equalsIgnoreCase("motion")) {
+            return motionSensor.isMotionDetected(); 
+        }
+
+        if (sensor instanceof DoorSensor doorSensor) {
+            if (conditionType.equalsIgnoreCase("doorOpen") && doorSensor.isDoorOpen()) return true;
+            if (conditionType.equalsIgnoreCase("doorClosed") && !doorSensor.isDoorOpen()) return true;
+        }
+
+        if (sensor instanceof TemperatureSensor temperatureSensor) {
+            double temp = temperatureSensor.getTemperature();
+            if (conditionType.equalsIgnoreCase("temperatureAbove") && temp > threshold) return true;
+            if (conditionType.equalsIgnoreCase("temperatureBelow") && temp < threshold) return true;
+        }
+
+        return false;
+    }
+
     public void executeAction() {
-        if (targetDevice instanceof Controllable) {
-            Controllable controllableDevice = (Controllable) targetDevice;
+        
+        if (targetDevice instanceof Controllable controllableDevice) {
             
-            switch (action) {
-                case "turnOn":
+            // CRITICAL FIX: Cast targetDevice to SmartDevice to safely call getId()
+            String deviceId = ((SmartDevice) targetDevice).getId();
+            String normalizedAction = action.toLowerCase();
+            
+            System.out.println("Rule [" + name + "] executing action: " + normalizedAction + " on " + deviceId); 
+
+            switch (normalizedAction) {
+                case "turnon":
                     controllableDevice.turnOn();
                     break;
-                case "turnOff":
+                case "turnoff":
                     controllableDevice.turnOff();
                     break;
                 case "toggle":
-                    // Fix: Since SmartDevice/Controllable doesn't have a 'toggle()', 
-                    // we replace it with a simple check and action.
-                    if (controllableDevice.getStatus().contains("OFF")) {
-                        controllableDevice.turnOn();
-                    } else {
+                    if (controllableDevice.getStatus().contains("ON")) { 
                         controllableDevice.turnOff();
+                    } else {
+                        controllableDevice.turnOn();
                     }
                     break;
                 default:
-                    System.out.println("Unknown action in rule: " + name);
+                    System.out.println("Error: Unknown action '" + action + "' in rule: " + name);
+                    break;
             }
         } else {
-            System.out.println("Error in Rule: Target device " + targetDevice.getId() + " is not controllable.");
+             System.out.println("Warning: Target device " + targetDevice.getId() + " is not controllable. Skipping action.");
         }
     }
 
     @Override
     public String toString() {
-        return "Rule[" + name + "]";
+        return "AutomationRule[" + name + "]";
     }
     
-    // ... (rest of the checkCondition method is omitted for brevity)
-    public boolean checkCondition(Home home) {
-        // ... (The rest of the checkCondition method remains unchanged)
-        if (sensor instanceof MotionSensor && conditionType.equals("motion")) {
-            return true; 
-        }
-
-        if (sensor instanceof DoorSensor) {
-            DoorSensor d = (DoorSensor) sensor;
-
-            if (conditionType.equals("doorOpen") && d.isDoorOpen()) return true;
-            if (conditionType.equals("doorClosed") && !d.isDoorOpen()) return true;
-        }
-
-        if (sensor instanceof TemperatureSensor) {
-            TemperatureSensor t = (TemperatureSensor) sensor;
-            double temp = t.getTemperature();
-
-            if (conditionType.equals("temperatureAbove") && temp > threshold) return true;
-            if (conditionType.equals("temperatureBelow") && temp < threshold) return true;
-        }
-
-        return false;
+    public SmartDevice getTargetDevice() {
+        return targetDevice;
     }
 }

@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package smarthome.devices;
 
 import smarthome.interfaces.Schedulable;
@@ -13,7 +9,7 @@ import java.util.Map;
 public class SmartTV extends SmartDevice implements Schedulable {
 
     private int volume;
-    private final Map<String, LocalTime> schedule; 
+    private final Map<String, LocalTime> schedule;  
 
     public SmartTV(String id) {
         super(id);
@@ -31,17 +27,6 @@ public class SmartTV extends SmartDevice implements Schedulable {
         return "SmartTV{id=" + id + ", volume=" + volume + ", status=" + getStatus() + "}";
     }
 
-    // Volume control methods
-    public void increase() {
-        if (volume < 100) volume += 5;
-        System.out.println(id + " volume increased to " + volume);
-    }
-
-    public void decrease() {
-        if (volume > 0) volume -= 5;
-        System.out.println(id + " volume decreased to " + volume);
-    }
-
     public int getVolume() {
         return volume;
     }
@@ -50,16 +35,15 @@ public class SmartTV extends SmartDevice implements Schedulable {
         this.volume = Math.max(0, Math.min(volume, 100));
     }
 
-    // EnergyConsumer methods
     @Override
     public void activateLowPowerMode() {
         System.out.println("SmartTV " + id + " is now in low-power mode.");
-        volume = Math.max(5, volume / 2); // reduce volume to save energy
+        volume = Math.max(5, volume / 2); 
     }
 
     @Override
     public double getCurrentPowerConsumption() {
-        return 0.2 + (volume * 0.01); // base + per volume unit
+        return 0.2 + (volume * 0.01); 
     }
 
     // Schedulable methods
@@ -78,8 +62,25 @@ public class SmartTV extends SmartDevice implements Schedulable {
         }
         return false;
     }
-
-    public Map<String, LocalTime> getSchedule() {
-        return schedule;
+    
+    @Override
+    public boolean executeScheduledTask(LocalTime currentTime) {
+        for (Map.Entry<String, LocalTime> entry : schedule.entrySet()) {
+            if (currentTime.equals(entry.getValue())) {
+                String action = entry.getKey();
+                System.out.println(id + " SCHEDULE TRIGGERED for action: " + action);
+                
+                switch (action.toLowerCase()) {
+                    case "turnon" -> turnOn();
+                    case "turnoff" -> turnOff();
+                    case "increasevolume" -> setVolume(getVolume() + 10);
+                    default -> System.out.println("Unknown scheduled action for TV: " + action);
+                }
+                
+                schedule.remove(action);
+                return true;
+            }
+        }
+        return false;
     }
 }

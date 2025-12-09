@@ -8,39 +8,32 @@ import smarthome.exceptions.DeviceNotFoundException;
 
 public class Home {
 
-    private LivingRoom livingRoom;
-    private Kitchen kitchen;
-    private Bedroom bedroom;
-    private Bathroom bathroom;
+    private final LivingRoom livingRoom;
+    private final Kitchen kitchen;
+    private final Bedroom bedroom;
+    private final Bathroom bathroom;
 
-    // GLOBAL list of all devices
-    private List<SmartDevice> allDevices;
+    private final List<SmartDevice> allDevices;
 
     public Home() {
-        livingRoom = new LivingRoom();
-        kitchen = new Kitchen();
-        bedroom = new Bedroom();
-        bathroom = new Bathroom();
+        this.livingRoom = new LivingRoom();
+        this.kitchen = new Kitchen();
+        this.bedroom = new Bedroom();
+        this.bathroom = new Bathroom();
 
-        allDevices = new ArrayList<>();
+        this.allDevices = new ArrayList<>();
     }
 
-    // ---------- Add device to Home AND Room ----------
     public void addDeviceToRoom(SmartDevice device, HomeStructure room) {
-        // add to room
         room.getRoomDevices().add(device);
-
-        // add to global list
         allDevices.add(device);
     }
 
-    // ---------- Getters ----------
     public LivingRoom getLivingRoom() { return livingRoom; }
     public Kitchen getKitchen() { return kitchen; }
     public Bedroom getBedroom() { return bedroom; }
     public Bathroom getBathroom() { return bathroom; }
 
-    // ---------- Global search ----------
     public SmartDevice findDeviceById(String id) throws DeviceNotFoundException {
         for (SmartDevice d : allDevices) {
             if (d.getId().equals(id)) return d;
@@ -49,6 +42,6 @@ public class Home {
     }
 
     public List<SmartDevice> getAllDevices() {
-        return new ArrayList<>(allDevices);
+        return new ArrayList<>(allDevices); 
     }
 }

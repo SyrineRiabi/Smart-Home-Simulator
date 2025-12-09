@@ -1,17 +1,30 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package sensors;
 
 public class MotionSensor extends Sensor {
 
+    private boolean motionDetected;
+
     public MotionSensor(String id) {
-        super(id); // Calls the constructor of Sensor, which sets the ID
+        super(id); 
+        this.motionDetected = false;
     }
 
     @Override
     public void detect() {
-        System.out.println("Motion detected by sensor " + getDeviceId());
+        if (getStatus()) {
+            this.motionDetected = true;
+            System.out.println("Motion detected by sensor " + getDeviceId());
+        } else {
+            System.out.println("Motion sensor " + getDeviceId() + " is OFF");
+        }
+    }
+
+    public boolean isMotionDetected() {
+        return this.motionDetected;
+    }
+
+    public void reset() {
+        this.motionDetected = false;
+        System.out.println("Motion sensor " + getDeviceId() + " state reset.");
     }
 }

@@ -1,4 +1,4 @@
- package smarthome.home;
+package smarthome.home;
 
 import java.util.List;
 import smarthome.devices.SmartDevice;
@@ -15,7 +15,6 @@ public abstract class HomeStructure {
         return name;
     }
 
-    // Each room MUST override this
     public abstract List<SmartDevice> getRoomDevices();
 }
 
