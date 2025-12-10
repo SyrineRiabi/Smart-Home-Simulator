@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" 
+      fx:controller="ui.controllers.DashboardController"
+      alignment="CENTER" 
+      spacing="15"
+      style="-fx-padding: 20; -fx-background-color: #1a1a2e;">
+    
+    <!-- Title -->
+    <Label text="🏠 YOUR REAL SMART HOME" 
+           style="-fx-font-size: 28px; -fx-text-fill: white; -fx-font-weight: bold;"/>
+    
+    <Label fx:id="statusLabel" text="✅ SYSTEM CONNECTED" 
+           style="-fx-font-size: 14px; -fx-text-fill: #4CAF50;"/>
+    
+    <Separator prefWidth="500"/>
+    
+    <!-- YOUR ACTUAL DEVICES -->
+    <VBox spacing="10" style="-fx-background-color: #162447; -fx-padding: 20; -fx-background-radius: 10;">
+        <Label text="🎛️ CONTROL YOUR REAL DEVICES" 
+               style="-fx-font-size: 18px; -fx-text-fill: white;"/>
+        
+        <!-- Living Room Light -->
+        <HBox spacing="20" alignment="CENTER_LEFT">
+            <Label text="💡 Living Room Light (L1-LR)" 
+                   style="-fx-font-size: 16px; -fx-text-fill: white;"/>
+            <Label fx:id="lightLabel" text="[OFF]" 
+                   style="-fx-font-size: 16px; -fx-text-fill: #FF9800; -fx-font-weight: bold;"/>
+            <Button text="TOGGLE" 
+                    fx:id="lightToggleBtn"
+                    style="-fx-font-size: 14px; -fx-padding: 8 20; -fx-background-color: #FF9800; -fx-text-fill: white;"
+                    onAction="#toggleLight"/>
+        </HBox>
+        
+        <!-- Thermostat -->
+        <HBox spacing="20" alignment="CENTER_LEFT">
+            <Label text="🌡️ Thermostat (T1-LR)" 
+                   style="-fx-font-size: 16px; -fx-text-fill: white;"/>
+            <Label fx:id="tempLabel" text="22°C" 
+                   style="-fx-font-size: 16px; -fx-text-fill: #00BCD4; -fx-font-weight: bold;"/>
+            <Button text="-" 
+                    fx:id="tempDownBtn"
+                    style="-fx-font-size: 14px; -fx-pref-width: 40; -fx-background-color: #f44336; -fx-text-fill: white;"
+                    onAction="#tempDown"/>
+            <Button text="+" 
+                    fx:id="tempUpBtn"
+                    style="-fx-font-size: 14px; -fx-pref-width: 40; -fx-background-color: #4CAF50; -fx-text-fill: white;"
+                    onAction="#tempUp"/>
+        </HBox>
+        
+        <!-- Refrigerator -->
+        <HBox spacing="20" alignment="CENTER_LEFT">
+            <Label text="❄️ Refrigerator (FR1-KI)" 
+                   style="-fx-font-size: 16px; -fx-text-fill: white;"/>
+            <Label fx:id="fridgeLabel" text="[ON]" 
+                   style="-fx-font-size: 16px; -fx-text-fill: #2196F3; -fx-font-weight: bold;"/>
+            <Button text="TOGGLE" 
+                    fx:id="fridgeToggleBtn"
+                    style="-fx-font-size: 14px; -fx-padding: 8 20; -fx-background-color: #2196F3; -fx-text-fill: white;"
+                    onAction="#toggleFridge"/>
+        </HBox>
+        
+        <!-- Alarm -->
+        <HBox spacing="20" alignment="CENTER_LEFT">
+            <Label text="⏰ Bedroom Alarm (A1-BR)" 
+                   style="-fx-font-size: 16px; -fx-text-fill: white;"/>
+            <Label fx:id="alarmLabel" text="[OFF]" 
+                   style="-fx-font-size: 16px; -fx-text-fill: #9C27B0; -fx-font-weight: bold;"/>
+            <Button text="TOGGLE" 
+                    fx:id="alarmToggleBtn"
+                    style="-fx-font-size: 14px; -fx-padding: 8 20; -fx-background-color: #9C27B0; -fx-text-fill: white;"
+                    onAction="#toggleAlarm"/>
+        </HBox>
+    </VBox>
+    
+    <Separator prefWidth="500"/>
+    
+    <!-- Energy Report -->
+    <VBox spacing="10" style="-fx-background-color: #0f3460; -fx-padding: 20; -fx-background-radius: 10;">
+        <Label text="⚡ ENERGY REPORT" 
+               style="-fx-font-size: 18px; -fx-text-fill: white;"/>
+        
+        <Label fx:id="energyReportLabel" text="Click to generate energy report" 
+               style="-fx-font-size: 14px; -fx-text-fill: #bdc3c7;"/>
+        
+        <Button text="GENERATE ENERGY REPORT" 
+                fx:id="energyReportBtn"
+                style="-fx-font-size: 14px; -fx-padding: 10 25; -fx-background-color: #FF9800; -fx-text-fill: white;"
+                onAction="#generateEnergyReport"/>
+    </VBox>
+    
+    <Separator prefWidth="500"/>
+    
+    <!-- Command Console -->
+    <VBox spacing="10">
+        <Label text="🔧 COMMAND CONSOLE" 
+               style="-fx-font-size: 16px; -fx-text-fill: white;"/>
+        
+        <HBox spacing="10">
+            <TextField fx:id="commandField" 
+                       promptText="Type: toggle L1-LR, toggle FR1-KI, etc."
+                       prefWidth="300"
+                       style="-fx-font-size: 14px;"/>
+            <Button text="EXECUTE" 
+                    fx:id="executeBtn"
+                    style="-fx-font-size: 14px; -fx-padding: 10 20; -fx-background-color: #E91E63; -fx-text-fill: white;"
+                    onAction="#executeCommand"/>
+        </HBox>
+        
+        <Label text="💡 Try: toggle L1-LR | toggle FR1-KI | toggle A1-BR" 
+               style="-fx-font-size: 12px; -fx-text-fill: #bdc3c7;"/>
+    </VBox>
+    
+    <!-- Footer -->
+    <Label fx:id="footerLabel" 
+           text="Smart Home System | Devices: 4 | Status: Online" 
+           style="-fx-font-size: 12px; -fx-text-fill: #78909C;"/>
+    
+</VBox>

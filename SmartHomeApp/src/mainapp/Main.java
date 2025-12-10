@@ -77,7 +77,7 @@ public class Main {
         // --- TEST 2: SCHEDULING (Alarm) (Requirement 3.3) ---
         // ----------------------------------------------------
 
-        System.out.println("\n--- TEST 2: Scheduling (Alarm) ---");
+        System.out.println("\n--- TEST 2: Schedung (Alarm) ---");
         
         // Define the schedule for the alarm to go off at 07:00
         LocalTime alarmTime = LocalTime.of(7, 0);
@@ -173,3 +173,4 @@ public class Main {
         System.out.println("=================================================");
     }
 }
+
